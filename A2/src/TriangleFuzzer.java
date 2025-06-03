@@ -1,4 +1,3 @@
-import java.io.*;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -9,9 +8,9 @@ import java.util.concurrent.ThreadLocalRandom;
 public class TriangleFuzzer {
     private static final int MAX_ITERATIONS = 10000;
     private static final int MAX_VALUE = 1000;
-    private static Set<String> uniquePaths = new HashSet<>();
-    private static Map<String, Integer> pathCounts = new HashMap<>();
-    private static List<TestCase> interestingCases = new ArrayList<>();
+    private static final Set<String> uniquePaths = new HashSet<>();
+    private static final Map<String, Integer> pathCounts = new HashMap<>();
+    private static final List<TestCase> interestingCases = new ArrayList<>();
     
     static class TestCase {
         int a, b, c;
@@ -108,13 +107,13 @@ public class TriangleFuzzer {
     }
     
     private static int mutateValue(int value) {
-        switch (ThreadLocalRandom.current().nextInt(4)) {
-            case 0: return value + ThreadLocalRandom.current().nextInt(-5, 6); // Small change
-            case 1: return value * 2; // Double
-            case 2: return Math.max(0, value - 1); // Decrease
-            case 3: return ThreadLocalRandom.current().nextInt(MAX_VALUE); // Random
-            default: return value;
-        }
+        return switch (ThreadLocalRandom.current().nextInt(4)) {
+            case 0 -> value + ThreadLocalRandom.current().nextInt(-5, 6); // Small change
+            case 1 -> value * 2; // Double
+            case 2 -> Math.max(0, value - 1); // Decrease
+            case 3 -> ThreadLocalRandom.current().nextInt(MAX_VALUE); // Random
+            default -> value;
+        };
     }
     
     private static TestCase executeTriangle(int a, int b, int c) {
@@ -192,13 +191,13 @@ public class TriangleFuzzer {
     }
     
     private static String getPathDescription(String path) {
-        switch (path) {
-            case "F": return "Non-triangle";
-            case "TF": return "Regular triangle";
-            case "TTF": return "Isosceles triangle";
-            case "TTT": return "Equilateral triangle";
-            default: return "Unknown path";
-        }
+        return switch (path) {
+            case "F" -> "Non-triangle";
+            case "TF" -> "Regular triangle";
+            case "TTF" -> "Isosceles triangle";
+            case "TTT" -> "Equilateral triangle";
+            default -> "Unknown path";
+        };
     }
     
     private static void generateCoverageReport() {
