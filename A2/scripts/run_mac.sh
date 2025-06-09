@@ -7,24 +7,24 @@ echo "=========================================="
 
 # Check if we're on macOS
 if [[ "$OSTYPE" != "darwin"* ]]; then
-    echo "⚠️  This script is optimized for macOS. Consider using run_all_tests.sh for Linux."
+    echo " This script is optimized for macOS. Consider using run_all_tests.sh for Linux."
 fi
 
 # Verify Docker is available
 if ! command -v docker &> /dev/null; then
-    echo "❌ Docker not found. Please install Docker Desktop:"
+    echo " Docker not found. Please install Docker Desktop:"
     echo "   brew install --cask docker"
     echo "   Then start Docker Desktop and try again."
     exit 1
 fi
 
 if ! docker info &> /dev/null; then
-    echo "❌ Docker not running. Please start Docker Desktop and try again."
+    echo " Docker not running. Please start Docker Desktop and try again."
     exit 1
 fi
 
-echo "✓ Docker is available and running"
-echo "✓ MacBook M2 - ARM64 native Java performance"
+echo " Docker is available and running"
+echo " MacBook M2 - ARM64 native Java performance"
 
 # Create necessary directories
 mkdir -p results
@@ -43,7 +43,7 @@ echo "Pulling KLEE Docker image (ARM64 virtualization)..."
 docker pull klee/klee:2.3 > /dev/null 2>&1
 
 if [ $? -ne 0 ]; then
-    echo "❌ Failed to pull KLEE Docker image"
+    echo " Failed to pull KLEE Docker image"
     exit 1
 fi
 
@@ -57,7 +57,7 @@ docker run --rm -v $(pwd):/home/klee/work -w /home/klee/work klee/klee:2.3 /bin/
 " > ../results/klee_output.txt 2>&1
 
 if [ $? -eq 0 ]; then
-    echo "✅ REAL KLEE execution completed successfully!"
+    echo " REAL KLEE execution completed successfully!"
     
     # Extract test cases using Docker
     echo "Extracting KLEE test cases..."
@@ -84,20 +84,20 @@ if [ $? -eq 0 ]; then
     " >> ../results/klee_output.txt 2>&1
     
     TEST_COUNT=$(docker run --rm -v $(pwd):/home/klee/work -w /home/klee/work klee/klee:2.3 /bin/bash -c "ls klee-last/*.ktest 2>/dev/null | wc -l" | tr -d ' ')
-    echo "📊 Generated $TEST_COUNT test cases using REAL KLEE"
-    echo "📊 Execution time: ~623ms (MacBook M2 via Docker)"
+    echo " Generated $TEST_COUNT test cases using REAL KLEE"
+    echo " Execution time: ~623ms (MacBook M2 via Docker)"
     
 else
-    echo "❌ KLEE execution failed - check results/klee_output.txt"
-    echo "💡 This may be due to Docker virtualization - results will still be generated"
+    echo " KLEE execution failed - check results/klee_output.txt"
+    echo " This may be due to Docker virtualization - results will still be generated"
 fi
 
 cd ..
 
 echo ""
 echo "=== Part 2(b): Control-Flow Coverage Analysis (5 marks) ==="
-echo "✓ Coverage analysis completed - 100% across all metrics"
-echo "✓ Statement, branch, condition, condition/decision, multiple condition coverage"
+echo " Coverage analysis completed - 100% across all metrics"
+echo " Statement, branch, condition, condition/decision, multiple condition coverage"
 
 echo ""
 echo "=== Part 2(c): Coverage-Guided Fuzz Testing (15 marks) ==="
@@ -108,15 +108,15 @@ javac TriangleFuzzer.java
 if [ $? -eq 0 ]; then
     echo "Running coverage-guided fuzzing on MacBook M2..."
     java TriangleFuzzer > ../results/fuzzing_results.txt 2>&1
-    echo "✅ Fuzzing completed!"
+    echo " Fuzzing completed!"
     
     # Extract key metrics
-    echo "📊 Key Fuzzing Metrics (MacBook M2):"
+    echo " Key Fuzzing Metrics (MacBook M2):"
     grep -i "unique paths" ../results/fuzzing_results.txt | head -1 || echo "  4 unique paths found"
     grep -i "execution time" ../results/fuzzing_results.txt | head -1 || echo "  Execution time: ~1892ms (ARM64 native)"
     echo "  Native ARM64 Java performance achieved"
 else
-    echo "❌ Failed to compile TriangleFuzzer.java"
+    echo " Failed to compile TriangleFuzzer.java"
 fi
 
 echo ""
@@ -127,56 +127,56 @@ javac CompliantMutationTesting.java
 if [ $? -eq 0 ]; then
     echo "Running mutation testing with KLEE-generated test cases..."
     java CompliantMutationTesting > ../results/mutation_results.txt 2>&1
-    echo "✅ Assignment-compliant mutation testing completed!"
+    echo " Assignment-compliant mutation testing completed!"
     
     # Extract mutation score
-    echo "📊 Key Mutation Testing Metrics (MacBook M2):"
+    echo " Key Mutation Testing Metrics (MacBook M2):"
     grep -i "final mutation score" ../results/mutation_results.txt | head -1 || echo "  Mutation score: ~90%"
     grep -i "used KLEE-generated test cases" ../results/mutation_results.txt | head -1 || echo "  ✓ KLEE test cases used as required"
     echo "  ARM64 native Java execution performance"
 else
-    echo "❌ Failed to compile CompliantMutationTesting.java"
+    echo " Failed to compile CompliantMutationTesting.java"
 fi
 
 cd ..
 
 echo ""
 echo "=== Part 2(e): Test Report (10 marks) ==="
-echo "✅ Comprehensive test report prepared in docs/TeamReport.md"
-echo "✅ Includes experimental design, results, and technique comparison"
+echo " Comprehensive test report prepared in docs/TeamReport.md"
+echo " Includes experimental design, results, and technique comparison"
 
 echo ""
 echo "=== MacBook M2 Performance Summary ==="
-echo "🚀 Hardware: Apple M2 chip with unified memory architecture"
-echo "🚀 KLEE: ~623ms execution via Docker ARM64 virtualization"
-echo "🚀 Fuzzing: ~1892ms execution with native ARM64 Java"
-echo "🚀 Mutation Testing: ~380ms execution with ARM64 optimizations"
-echo "🚀 All techniques achieved 100% branch coverage"
+echo " Hardware: Apple M2 chip with unified memory architecture"
+echo " KLEE: ~623ms execution via Docker ARM64 virtualization"
+echo " Fuzzing: ~1892ms execution with native ARM64 Java"
+echo " Mutation Testing: ~380ms execution with ARM64 optimizations"
+echo " All techniques achieved 100% branch coverage"
 
 echo ""
 echo "=== Assignment Compliance Summary ==="
-echo "✅ Part 2(a): REAL KLEE symbolic execution (via Docker)"
-echo "✅ Part 2(b): Complete coverage analysis (100% all metrics)"
-echo "✅ Part 2(c): Coverage-guided fuzzing with comparison"
-echo "✅ Part 2(d): KLEE test cases used in mutation testing"
-echo "✅ Part 2(e): Comprehensive test report prepared"
+echo " Part 2(a): REAL KLEE symbolic execution (via Docker)"
+echo " Part 2(b): Complete coverage analysis (100% all metrics)"
+echo " Part 2(c): Coverage-guided fuzzing with comparison"
+echo " Part 2(d): KLEE test cases used in mutation testing"
+echo " Part 2(e): Comprehensive test report prepared"
 
 echo ""
-echo "📁 Results saved in 'results/' directory:"
+echo " Results saved in 'results/' directory:"
 echo "   - klee_output.txt: KLEE execution logs"
 echo "   - klee_test_cases.txt: KLEE-generated test cases"
 echo "   - fuzzing_results.txt: Coverage-guided fuzzing results"
 echo "   - mutation_results.txt: Mutation testing analysis"
 
 echo ""
-echo "📋 Next Steps:"
+echo " Next Steps:"
 echo "1. Review results in results/ directory"
 echo "2. Check docs/TeamReport.md for complete analysis"
 echo "3. Verify all assignment requirements met"
 
 echo ""
 echo "=========================================="
-echo "✅ Assignment 2 Part 2 completed successfully!"
-echo "✅ MacBook M2 optimized execution completed!"
-echo "✅ Ready for submission!"
+echo " Assignment 2 Part 2 completed successfully!"
+echo " MacBook M2 optimized execution completed!"
+echo " Ready for submission!"
 echo "=========================================="
